@@ -15,6 +15,7 @@ module.exports = {
     articlename: { type: "string", required: true, unique: true },
     content: { type: "string", required: true, columnType: 'text' },
     public: { type: "boolean", defaultsTo: true },
+    sources: {type: "string", required: true, columnType: 'text'},
 
 
 
