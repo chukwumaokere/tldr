@@ -21,7 +21,6 @@ module.exports.routes = {
 
   '/': { view: 'pages/homepage' },
 
-
   /***************************************************************************
   *                                                                          *
   * More custom routes here...                                               *
@@ -32,6 +31,13 @@ module.exports.routes = {
   * not match any of those, it is matched against static assets.             *
   *                                                                          *
   ***************************************************************************/
+ 'GET /:articlename': 'ArticlesController.getPage',
+ 'GET /article': { action: 'view-article' },
 
-
+  //  ╔═╗╔═╗╦  ╔═╗╔╗╔╔╦╗╔═╗╔═╗╦╔╗╔╔╦╗╔═╗
+  //  ╠═╣╠═╝║  ║╣ ║║║ ║║╠═╝║ ║║║║║ ║ ╚═╗
+  //  ╩ ╩╩  ╩  ╚═╝╝╚╝═╩╝╩  ╚═╝╩╝╚╝ ╩ ╚═╝
+  // Note that, in this app, these API endpoints may be accessed using the `Cloud.*()` methods
+  // from the Parasails library, or by using those method names as the `action` in <ajax-form>.
+  'GET /api/v1/article/:articlename': 'ArticlesController.getPage',
 };
