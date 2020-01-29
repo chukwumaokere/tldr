@@ -15,11 +15,16 @@ This app was originally generated on Tue Jan 28 2020 20:31:08 GMT-0600 (Central 
 
 
 ### Example Create API:    
+#### Run these in your browser to quickly create content in the database.
+<pre><code>
 http://localhost:1337/articles/Create?articlename=Coronavirus&content=["Is a common virus", "Causes respiratory infrections which are typically mild", "SARS and MERS is a type of coronavirus", "MERS first appeared in 2012 in Saudi Arabia", "In 2003, 774 people died from a severe acute respiratory syndrome (SARS) outbreak", "Often a coronavirus causes upper respiratory infection symptoms like a stuffy nose, cough, and sore throat.", "You can treat them with rest and over-the-counter medication.", "The coronavirus can also cause middle ear infections in children.", "Currently 5 cases of Coronavirus in US. one each in Illinois, Arizona and Washington state, and two in California.", "At least 5,974 cases have been confirmed in China and 132 have died as of late January 27, 2020 Chinese officials said. There were 56 confirmed cases in other countries, the World Health Organization said January 27, 2020."]&sources=["https://www.webmd.com/lung/coronavirus", "https://www.nbcnews.com/health/health-news/coronavirus-u-s-map-where-virus-has-been-confirmed-across-n1124546"]    
+</code></pre>
 
+<pre><code>
 http://localhost:1337/articles/Create?articlename=SpaceX&content=["A private American aerospace manufacturer and space transportation services company headquartered in Hawthorne, California. It was founded in 2002 by Elon Musk with the goal of reducing space transportation costs to enable the colonization of Mars", "SpaceX is now privately valued at $33.3 billion, CNBC reported Friday. MAY 31 2019", "SpaceX successfully launched 60 Starlink satellites into orbit, and revealed that it has raised more than $1 billion in fresh funding in 2019"]&sources=["https://en.wikipedia.org/wiki/SpaceX", "https://www.cnbc.com/2019/05/31/elon-musk-spacex-is-now-worth-more-than-tesla.html"]
+</code></pre>
 
-### Other endpoints:   
+### Other public endpoints:   
 http://localhost:1337/api/v1/article/coronavirus   
 http://localhost:1337/api/v1/articles   
 
