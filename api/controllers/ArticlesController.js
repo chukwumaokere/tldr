@@ -6,6 +6,22 @@
  */
 
 module.exports = {
+  getHomePage: async function (req, res){
+    const query = `SELECT articlename FROM articles WHERE public = 1`;
+    const result = await sails.sendNativeQuery(query)    
+    let articleNames = []
+
+    if(result.rows.length > 0){
+      result.rows.forEach((article) => {
+        articleNames.push(article.articlename)
+      })
+    } else {
+      return res.notFound()
+    }
+
+    return res.view('pages/homepage', { articleNames})
+  },
+
   getPage: async function(req, res){
     var articlename = req.param('articlename').toLowerCase();
     var query = `SELECT * FROM articles WHERE articlename = $1 AND public = 1`;
