@@ -40,7 +40,15 @@ module.exports.routes = {
   //  ╩ ╩╩  ╩  ╚═╝╝╚╝═╩╝╩  ╚═╝╩╝╚╝ ╩ ╚═╝
   // Note that, in this app, these API endpoints may be accessed using the `Cloud.*()` methods
   // from the Parasails library, or by using those method names as the `action` in <ajax-form>.
+
+  // Article Routes
   'GET /api/v1/articles': 'ArticlesController.getArticles',
   'GET /api/v1/article/:articlename': 'ArticlesController.getArticle',
+  'POST /api/v1/articles/create': "ArticlesController.generateArticle",
+  // Ratings routes
+  'GET /api/v1/:articlename/rating': 'ArticlesController.getRating',
+  'POST /api/v1/:articlename/rating/:direction': 'ArticlesController.postRating'
+
+
   //'POST /api/v1/article'
 };
