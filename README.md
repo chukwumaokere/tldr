@@ -11,7 +11,18 @@ This app was originally generated on Tue Jan 28 2020 20:31:08 GMT-0600 (Central 
 
 
 ### Set up
-
+* Git clone this repo
+* Inside the directory run `npm install`
+* then create a file in config/ named `local.js`
+* Put this in `config/local.js`: 
+```
+module.exports = {
+  datastore_url: 'mysql://mysqluser:password@localhost:3306/tldr',
+};
+```
+* Be sure to change `mysqluser` and `password` in that `local.js` file to your mysql information. It should create the database and table for you. If not, just create the database `tldr` and it will automatically create the tables for you.
+* run `node app.js`. You can also use nodemon, pm2, or some other daemon to keep the program running.
+* Run the example create API's below to get started with some content.
 
 
 ### Example Create API:    
