@@ -7,19 +7,22 @@
 
 module.exports = {
   getHomePage: async function (req, res){
-    const query = `SELECT articlename FROM articles WHERE public = 1`;
+    const query = `SELECT articlename, rating FROM articles WHERE public = 1`;
     const result = await sails.sendNativeQuery(query)    
-    let articleNames = []
+    let articles = []
 
     if(result.rows.length > 0){
       result.rows.forEach((article) => {
-        articleNames.push(article.articlename)
+        articles.push({
+          title: article.articlename,
+          rating: article.rating
+        })
       })
     } else {
       return res.notFound()
     }
 
-    return res.view('pages/homepage', { articleNames })
+    return res.view('pages/homepage', { articles })
   },
 
   getPage: async function(req, res){
@@ -68,10 +71,6 @@ module.exports = {
     const result = await sails.sendNativeQuery(query, [articlename])
     const data = result.rows[0]
 
-    // if(typeof data !== Number){
-    //   throw new Error('No rating found')
-    // }
-    console.log(data)
     return res.ok(data)
   },
   postRating: async function(req, res){

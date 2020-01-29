@@ -3,8 +3,14 @@
 <div class="container">
   <div class="article-list">
     <ul class="article-list-items">
-      <% articleNames.forEach(function(articleTitle) { %>
-        <li> <a href="/<%= articleTitle %>"><%= articleTitle %> </a></li>
+      <% articles.forEach(function(article) { %>
+        <li> 
+          <a href="/<%= article.title %>">
+            <%= article.title%> - <%= article.rating %>
+        </a>
+        <button class="rating-button-upvote">Upvote</button>
+        <button class="rating-button-downvote">Downvote</button>
+      </li>
       <% }) %>
     </ul>
   </div>
