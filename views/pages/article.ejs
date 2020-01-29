@@ -1,0 +1,14 @@
+<div id="article" v-cloak>
+
+  <h1 class="articlename"><%= articlename %></h1>
+  <ul class="article-content">
+    <% article.forEach(function(bullet){ %>
+      <li><%= bullet %></li>
+    <% }) %>
+  </ul>
+  <br>
+  <em>Date Created: <%= ct %></em>
+  <br>
+  <em>Last Updated: <%= ut %></em>
+</div>
+<%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>
