@@ -19,7 +19,8 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  '/': { view: 'pages/homepage' },
+ 'GET /': 'ArticlesController.getHomePage' ,
+  // 'GET /': 'ArticlesController.getPage',
 
   /***************************************************************************
   *                                                                          *
