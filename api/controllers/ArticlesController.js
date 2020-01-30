@@ -78,22 +78,20 @@ module.exports = {
     const articlename = req.param('articlename').toLowerCase()
     const voteDirection = req.param('voteDirection')
 
+    const ratingQuery = `SELECT rating FROM articles WHERE articlename = $1`
+    const ratingResult = await sails.sendNativeQuery(ratingQuery, [articlename])
 
-    // let rating = this.getRating()
-    // const query = `UPDATE articles SET rating = $1 WHERE articlename = $2`
+    let ratingValue = ratingResult.rows[0].rating
 
-    // console.log(this.getRating(req.param('articlename')), [])
+    const updateQuery = `UPDATE articles SET rating = $1 WHERE articlename = $2`
 
-    console.log(articlename, voteDirection)
-    console.log(`rating result: ${ratingResult}`)
+    if(voteDirection === 'upvote'){
+      ratingValue++
+    } else if (voteDirection === 'downvote'){
+      ratingValue--
+    }
 
-    // if(voteDirection === 'upvote'){
-    //   rating++
-    // } else if (voteDirection === 'downvote'){
-    //   rating--
-    // }
-
-    // await sails.sendNativeQuery(query, [rating, articlename])
+    await sails.sendNativeQuery(updateQuery, [ratingValue, articlename])
 
     return res.ok('Article rating updated')
   }
