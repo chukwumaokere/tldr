@@ -68,7 +68,7 @@ module.exports = {
   // RATINGS - functions relating to the ratings feature for articles
   getRating: async function(req, res){
     const articlename = req.param('articlename').toLowerCase()
-    const query = `SELECT rating FROM articles`;
+    const query = `SELECT articlename, rating FROM articles WHERE articlename = $1`;
     const result = await sails.sendNativeQuery(query, [articlename])
     const data = result.rows[0]
 
@@ -79,21 +79,19 @@ module.exports = {
     const voteDirection = req.param('voteDirection')
 
     const ratingQuery = `SELECT rating FROM articles WHERE articlename = $1`
+    const updateQuery = `UPDATE articles SET rating = $1 WHERE articlename = $2`
     const ratingResult = await sails.sendNativeQuery(ratingQuery, [articlename])
-
     let ratingValue = ratingResult.rows[0].rating
 
-    const updateQuery = `UPDATE articles SET rating = $1 WHERE articlename = $2`
-
     if(voteDirection === 'upvote'){
-      ratingValue++
+      ratingValue = ratingValue + 1
     } else if (voteDirection === 'downvote'){
-      ratingValue--
+      ratingValue = ratingValue - 1
     }
 
     await sails.sendNativeQuery(updateQuery, [ratingValue, articlename])
 
-    return res.ok('Article rating updated')
+    return res.ok(`Article rating updated`)
   }
 };
 

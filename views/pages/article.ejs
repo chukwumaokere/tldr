@@ -1,11 +1,19 @@
+
+
 <div id="article" v-cloak>
   <div class="container">
     <h1 class="articlename"><%= articlename %></h1>
     <h3 class="rating-text">Rating: <%= rating %></h3>
     <span class="article-vote-buttons">
-      <button class="upvote-button" href="/api/v1/:articlename/rating/upvote">Upvote</button>
-      <button class="downvote-button" href="/api/v1/:articlename/rating/downvote">Downvote</button>
+        <button class="upvote-button" onclick="rate('<%= articlename %>', 'up')">
+          Upvote
+        </button>
+
+        <button  class="downvote-button" onclick="rate('<%= articlename %>', 'down')">
+          Downvote
+        </button>
     </span>
+    
     <ul class="article-content">
       <% article.forEach(function(bullet){ %>
         <li><%= bullet %></li>
@@ -17,4 +25,23 @@
     <em>Last Updated: <%= ut %></em>
   </div>
 </div>
+
+<script>
+  function rate(article, direction){
+    console.log('Modifying rating for', article);
+    var xhr = new XMLHttpRequest();
+    if(direction =='down'){
+      console.log('going down');
+      xhr.open('POST', '/api/v1/'+article+'/rating/downvote');
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.send();
+    }
+    if (direction =='up'){
+      console.log('going up');
+      xhr.open('POST', '/api/v1/'+article+'/rating/upvote', true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.send();
+    }
+  }
+</script>
 <%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>
