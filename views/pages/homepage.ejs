@@ -5,11 +5,7 @@
     <ul class="article-list-items">
       <% articles.forEach(function(article) { %>
         <li> 
-          <a href="/<%= article.title %>">
-            <%= article.title%> - <%= article.rating %>
-        </a>
-        <button class="rating-button-upvote">Upvote</button>
-        <button class="rating-button-downvote">Downvote</button>
+          <a href="/<%= article.title %>"> <%= article.title %> - <%= article.rating %></a>
       </li>
       <% }) %>
     </ul>
