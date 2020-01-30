@@ -75,11 +75,15 @@ module.exports = {
     return res.ok(data)
   },
   postRating: async function(req, res){
-    // const voteDirection = req.param('voteDirection')
+    const articlename = req.param('articlename').toLowerCase()
+    const voteDirection = req.param('voteDirection')
     // let rating = this.getRating()
     // const query = `UPDATE articles SET rating = $1 WHERE articlename = $2`
 
-    console.log(this.getRating(req.param('articlename')), [])
+    // console.log(this.getRating(req.param('articlename')), [])
+
+    console.log(articlename, voteDirection)
+
     // if(voteDirection === 'upvote'){
     //   rating++
     // } else if (voteDirection === 'downvote'){
