@@ -1,10 +1,13 @@
-<h1>Mutha F*ckin' Articles</h1>
-
+<div class="container">
+  <h1>Mutha F*ckin' Articles</h1>
+</div>
 <div class="container">
   <div class="article-list">
     <ul class="article-list-items">
-      <% articleNames.forEach(function(articleTitle) { %>
-        <li> <a href="/<%= articleTitle %>"><%= articleTitle %> </a></li>
+      <% articles.forEach(function(article) { %>
+        <li> 
+          <a href="/<%= article.title %>"> <%= article.title %> - <%= article.rating %></a>
+      </li>
       <% }) %>
     </ul>
   </div>
