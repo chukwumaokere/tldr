@@ -9,7 +9,8 @@
  */
 var locals = require('./local');
 module.exports.custom = {
-
+    baseUrl: 'http://tldr.click',
+    internalEmailAddress: 'support@example.com',
   /***************************************************************************
   *                                                                          *
   * Any other custom config this Sails app should use during development.    *
