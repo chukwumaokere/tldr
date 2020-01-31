@@ -3,20 +3,20 @@
 <div id="article" v-cloak>
   <div class="container">
     <h1 class="articlename"><%= articlename %></h1>
-    <h3 class="rating-text">Rating: <%= rating %></h3>
+    <h5 class="rating-text">Rating: <%= rating %></h5>
     <span class="article-vote-buttons">
-        <button class="upvote-button" onclick="rate('<%= articlename %>', 'up')">
-          Upvote
+        <button class="upvote-butto waves-effect waves-light btn-small" onclick="rate('<%= articlename %>', 'up')">
+          <i class="material-icons">arrow_upward</i>
         </button>
 
-        <button  class="downvote-button" onclick="rate('<%= articlename %>', 'down')">
-          Downvote
+        <button  class="downvote-button waves-effect waves-light btn-small" onclick="rate('<%= articlename %>', 'down')">
+          <i class="material-icons">arrow_downward</i>
         </button>
     </span>
     
-    <ul class="article-content">
+    <ul class="article-content collection">
       <% article.forEach(function(bullet){ %>
-        <li><%= bullet %></li>
+        <li class="collection-item flex"><i class="material-icons">radio_button_checked</i><div class="item"><%= bullet %></div></li>
       <% }) %>
     </ul>
     <br>

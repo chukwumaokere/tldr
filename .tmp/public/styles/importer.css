@@ -16,3 +16,14 @@ body {
 body {
   background-color: #ebd5b3;
 }
+#article .collection {
+  border: 0;
+}
+#article .flex {
+  display: flex;
+}
+#article .collection-item {
+  background-color: transparent;
+  border-bottom: 0;
+  padding: 5px 0px;
+}
