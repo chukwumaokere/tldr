@@ -65,6 +65,38 @@ module.exports = {
         return res.ok([]); //If page doesnt exist, give them a 404. TODO: Later we can add a suggestion page to intake suggestions or fully fleshed articles.
     }
   },
+  generateArticle: async function(req, res){
+    const newArticleName = req.param('articlename').toLowerCase()
+    const content = req.param('content')
+    const sources = req.param('content')
+    const isPublic = req.param('isPublic')
+
+    const checkArticlesQuery = `SELECT articlename FROM articles WHERE articlename = $1`
+    const checkArticlesResult = await sails.sendNativeQuery(checkArticlesQuery, [newArticleName])
+    const articleExists = checkArticlesResult.rows.length > 0 ? true : false
+    
+    if (articleExists){
+      throw new Error('Article already exists')
+    }
+
+    const createdAt = Math.round(new Date().getTime())
+    const updatedAt = Math.round(new Date().getTime())
+
+    const insertArticleQuery = `INSERT INTO articles (
+      articlename,
+      content,
+      sources,
+      createdAt,
+      updatedAt,
+      public,
+      rating)
+      VALUES($1, $2, $3, $4, $5, $6, 0)`
+
+
+    await sails.sendNativeQuery(insertArticleQuery, [newArticleName, content, sources, createdAt, updatedAt, isPublic])
+
+    return res.ok('Article created')
+  },
   // RATINGS - functions relating to the ratings feature for articles
   getRating: async function(req, res){
     const articlename = req.param('articlename').toLowerCase()
