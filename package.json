@@ -2,7 +2,7 @@
   "name": "tldr",
   "private": true,
   "version": "0.0.1",
-  "description": "a Sails application",
+  "description": "too long; didn't read",
   "keywords": [],
   "dependencies": {
     "@sailshq/connect-redis": "^3.2.1",

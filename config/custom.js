@@ -9,7 +9,7 @@
  */
 var locals = require('./local');
 module.exports.custom = {
-    baseUrl: 'http://tldr.click',
+    baseUrl: 'http://localhost:1337',
     internalEmailAddress: 'support@example.com',
   /***************************************************************************
   *                                                                          *

@@ -70,7 +70,7 @@ module.exports = {
       * https://sailsjs.com/config/datastores                                     *
       *                                                                           *
       ****************************************************************************/
-      // ssl: true,
+      ssl: false,
       adapter: 'sails-mysql',
       url: locals.datastore_url,
     },
@@ -222,7 +222,7 @@ module.exports = {
     *                                                                          *
     ***************************************************************************/
     cookie: {
-      // secure: true,
+      secure: false,
       maxAge: 24 * 60 * 60 * 1000,  // 24 hours
     },
 
@@ -253,7 +253,9 @@ module.exports = {
     ***************************************************************************/
      onlyAllowOrigins: [
        'http://tldr.click',
-       'http://localhost:8080',
+       'https://tldr.click',
+       'http://localhost:1337',
+       'https://localhost:1337',
      ],
 
 
@@ -293,7 +295,7 @@ module.exports = {
   *                                                                         *
   ***************************************************************************/
   log: {
-    level: 'debug'
+    level: 'silly'
   },
 
 
@@ -323,7 +325,7 @@ module.exports = {
     * (https://sailsjs.com/config/http)                                        *
     *                                                                          *
     ***************************************************************************/
-    // trustProxy: true,
+     trustProxy: true,
 
   },
 
