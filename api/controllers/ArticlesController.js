@@ -97,6 +97,44 @@ module.exports = {
 
     return res.ok('Article created')
   },
+  updateArticle: async function(req, res){
+    const articleName = req.param('articlename').toLowerCase()
+    const updateMethod = req.body.updateMethod
+    const contentToUpdate = req.body.newContent
+    const sourcesToUpdate = req.body.newSources
+    const updatedPublicStatus = req.body.public
+    const updatedAtTime = Math.round(new Date().getTime())
+
+    const articleExists = await sails.sendNativeQuery(`SELECT * FROM articles WHERE articlename = $1`, [articleName])
+    const currentContent = currentArticleBody.content
+    const currentSources = currentArticleBody.sources
+
+    const newContentArray = currentContent.concat(contentToUpdate)
+    const newSourcesArray = currentSources.concat(sourcesToUpdate)
+
+    if(!articleExists){
+      return res.status(400).send("No article found with that name. Please create the article first, or try again with an existing article name")
+    } 
+
+    if(updateMethod === 'append'){
+      // CODE FOR APPENDING DATA
+    }else if (updateMethod === 'overwrite') {
+      // CODE FOR OVERWRITING ALL EXISTING DATA
+    } else {
+      return res.status(400).send("You must specify a valid value for updateMethod to complete this operation. Options are 'append' & 'overwrite'")
+    }
+
+    const updatedArticle = await sails.sendNativeQuery(`SELECT * FROM articles WHERE articlename = $1`, [articleName])
+
+    // query to update existing article with returnedArticleProperties
+    // const articleUpdateQuery = `UPDATE articles
+    //   SET content = $1, sources = $2
+    //   WHERE articlename = $3`
+
+    // await sails.sendNativeQuery(articleUpdateQuery, [updatedContent, updatedSources, articleName])
+
+    return res.ok({"Success": true, "Article": updatedArticle})
+  },
   // RATINGS - functions relating to the ratings feature for articles
   getRating: async function(req, res){
     const articlename = req.param('articlename').toLowerCase()
@@ -113,6 +151,7 @@ module.exports = {
     const ratingQuery = `SELECT rating FROM articles WHERE articlename = $1`
     const updateQuery = `UPDATE articles SET rating = $1 WHERE articlename = $2`
     const ratingResult = await sails.sendNativeQuery(ratingQuery, [articlename])
+  
     let ratingValue = ratingResult.rows[0].rating
 
     if(voteDirection === 'upvote'){
