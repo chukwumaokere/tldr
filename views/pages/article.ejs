@@ -1,7 +1,6 @@
-
-
 <div id="article" v-cloak>
   <div class="container">
+    <div class="back-arrow"> <a href="#" onclick="if (window.history.length > 2 ){ window.history.back(); }else{ window.location.href='<%= sails.config.custom.baseUrl %>'};"><— Back </a></div>
     <h1 class="articlename"><%= articlename %></h1>
     <h5 class="rating-text">Rating: <%= rating %></h5>
     <span class="article-vote-buttons">
@@ -27,9 +26,18 @@
 </div>
 
 <script>
+  var ratings;
+  try{
+    ratings = localStorage.getItem('ratings');
+    ratings = JSON.parse(ratings);
+    console.log("Retrieved cached ratings", ratings);
+  }catch(err){
+    console.log("Couldn't fetch cached ratings", err);
+  }
   function rate(article, direction){
     console.log('Modifying rating for', article);
     var xhr = new XMLHttpRequest();
+    
     if(direction =='down'){
       console.log('going down');
       xhr.open('POST', '/api/v1/'+article+'/rating/downvote');
