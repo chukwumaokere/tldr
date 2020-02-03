@@ -2,7 +2,7 @@
   <div class="container">
     <div class="back-arrow"> <a href="#" onclick="if (window.history.length > 2 ){ window.history.back(); }else{ window.location.href='<%= sails.config.custom.baseUrl %>'};"><— Back </a></div>
     <h1 class="articlename"><%= articlename %></h1>
-    <h5 class="rating-text">Rating: <%= rating %></h5>
+    <h5 class="rating-text">Rating: <span id="rating"><%= rating %></span></h5>
     <span class="article-vote-buttons">
         <button class="upvote-button waves-effect waves-light btn-small" onclick="rate('<%= articlename %>', 'up')">
           <i class="material-icons">arrow_upward</i>
@@ -26,29 +26,55 @@
 </div>
 
 <script>
-  var ratings;
-  try{
-    ratings = localStorage.getItem('ratings');
-    ratings = JSON.parse(ratings);
-    console.log("Retrieved cached ratings", ratings);
-  }catch(err){
-    console.log("Couldn't fetch cached ratings", err);
-  }
+  var xhr = new XMLHttpRequest();
   function rate(article, direction){
-    console.log('Modifying rating for', article);
-    var xhr = new XMLHttpRequest();
-    
-    if(direction =='down'){
-      console.log('going down');
-      xhr.open('POST', '/api/v1/'+article+'/rating/downvote');
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      xhr.send();
+    var modify = false;
+    var ratings = localStorage.getItem('ratings');
+    if(ratings){
+      var ratings = JSON.parse(ratings);
+      console.log("Retrieved cached ratings", ratings);
+    }else{
+      var ratings = {};
+      console.log("Couldn't fetch cached ratings");
     }
-    if (direction =='up'){
+    console.log('Attempting to modify rating for', article);
+    
+    if(direction =='down' && (ratings[article] === null || ratings[article] != "-1" || ratings === null) ){
+      var moddirection = "downvote";
+      var rate = "-1";
+      modify = true;  
+      console.log('going down');
+    }else if (direction =='up' && (ratings[article] === null || ratings[article] != "+1" || ratings === null) ){     
+      var moddirection = "upvote";
+      var rate = "+1";
+      modify = true;
       console.log('going up');
-      xhr.open('POST', '/api/v1/'+article+'/rating/upvote', true);
+    }else{
+      console.log("Already voted with this option, can only do the other option");
+    }
+    if (modify){
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/v1/'+article+'/rating/'+moddirection, true);
       xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
       xhr.send();
+      ratings[article] = rate;
+      ratings = JSON.stringify(ratings);
+      localStorage.setItem('ratings', ratings);
+      xhr.onreadystatechange = function (){
+        if(xhr.readyState == 4 && xhr.status == 200){
+          var xhr2 = new XMLHttpRequest();
+          xhr2.open('GET', '/api/v1/'+article+'/rating/');
+          xhr2.send();
+          xhr2.onreadystatechange = function (){
+            if(xhr2.readyState == 4 && xhr2.status == 200){
+              var newrating = JSON.parse(xhr2.response).rating;
+              console.log("new rating", newrating);
+              document.getElementById('rating').innerHTML = newrating;
+              console.log('view updated');
+            }
+          }
+        }
+      }
     }
   }
 </script>
