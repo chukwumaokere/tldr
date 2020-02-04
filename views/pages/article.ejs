@@ -1,14 +1,14 @@
 <div id="article" v-cloak>
   <div class="container">
-    <a href="/">Home</a>
+    <div class="back-arrow"> <a href="#" onclick="if (window.history.length > 2 ){ window.history.back(); }else{ window.location.href='<%= sails.config.custom.baseUrl %>'};"><— Back </a></div>
     <h1 class="articlename"><%= articlename %></h1>
-    <h5 class="rating-text">Rating: <%= rating %></h5>
+    <h5 class="rating-text">Rating: <span id="rating"><%= rating %></span></h5>
     <span class="article-vote-buttons">
-        <button class="upvote-button waves-effect waves-light btn-small" onclick="rate('<%= articlename %>', 'up')">
+        <button id="up-button" class="upvote-button waves-effect waves-light btn-small" onclick="rate('<%= articlename %>', 'up')">
           <i class="material-icons">arrow_upward</i>
         </button>
 
-        <button  class="downvote-button waves-effect waves-light btn-small" onclick="rate('<%= articlename %>', 'down')">
+        <button id="down-button" class="downvote-button waves-effect waves-light btn-small" onclick="rate('<%= articlename %>', 'down')">
           <i class="material-icons">arrow_downward</i>
         </button>
     </span>
@@ -26,20 +26,82 @@
 </div>
 
 <script>
-  function rate(article, direction){
-    console.log('Modifying rating for', article);
-    var xhr = new XMLHttpRequest();
-    if(direction =='down'){
-      console.log('going down');
-      xhr.open('POST', '/api/v1/'+article+'/rating/downvote');
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      xhr.send();
+  var ratings = localStorage.getItem('ratings');
+  function disableUp(){
+    document.getElementById("up-button").setAttribute("disabled", "");
+    document.getElementById("down-button").disabled = false;
+  }
+  function disableDown(){
+    document.getElementById("down-button").setAttribute("disabled", "");
+    document.getElementById("up-button").disabled = false;
+  }
+  if(ratings){
+    var ratings = JSON.parse(ratings);
+    console.log("Retrieved cached ratings on load", ratings);
+    var articlename = window.location.pathname.substring(1);
+    var ratingval = ratings[articlename];
+    if(ratingval){
+      console.log('rating found, adjusting display');
+      if (ratingval == "+1"){
+       disableUp();
+      }else if (ratingval == "-1"){
+       disableDown();
+      }
     }
-    if (direction =='up'){
+  }else{
+    var ratings = {};
+    console.log("Couldn't fetch cached ratings on load");
+  }
+  function rate(article, direction){
+    var modify = false;
+    var ratings = localStorage.getItem('ratings');
+    if(ratings){
+      var ratings = JSON.parse(ratings);
+      console.log("Retrieved cached ratings", ratings);
+    }else{
+      var ratings = {};
+      console.log("Couldn't fetch cached ratings");
+    }
+    console.log('Attempting to modify rating for', article);
+    
+    if(direction =='down' && (ratings[article] === null || ratings[article] != "-1" || ratings === null) ){
+      var moddirection = "downvote";
+      var rate = "-1";
+      modify = true;  
+      disableDown();
+      console.log('going down');
+    }else if (direction =='up' && (ratings[article] === null || ratings[article] != "+1" || ratings === null) ){     
+      var moddirection = "upvote";
+      var rate = "+1";
+      modify = true;
+      disableUp();
       console.log('going up');
-      xhr.open('POST', '/api/v1/'+article+'/rating/upvote', true);
+    }else{
+      console.log("Already voted with this option, can only do the other option");
+    }
+    if (modify){
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/v1/'+article+'/rating/'+moddirection, true);
       xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
       xhr.send();
+      ratings[article] = rate;
+      ratings = JSON.stringify(ratings);
+      localStorage.setItem('ratings', ratings);
+      xhr.onreadystatechange = function (){
+        if(xhr.readyState == 4 && xhr.status == 200){
+          var xhr2 = new XMLHttpRequest();
+          xhr2.open('GET', '/api/v1/'+article+'/rating/');
+          xhr2.send();
+          xhr2.onreadystatechange = function (){
+            if(xhr2.readyState == 4 && xhr2.status == 200){
+              var newrating = JSON.parse(xhr2.response).rating;
+              console.log("new rating", newrating);
+              document.getElementById('rating').innerHTML = newrating;
+              console.log('view updated');
+            }
+          }
+        }
+      }
     }
   }
 </script>
