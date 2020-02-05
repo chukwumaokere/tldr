@@ -112,19 +112,9 @@ module.exports = {
   },
   updateArticle: async function(req, res) {
     // CURRENT ARTICLE
-    const articleName = req.body.articlename
+    const articleName = req.param('articlename');
     const getCurrentArticleQuery = `SELECT * FROM articles WHERE articlename = $1`
     const queryResult = await sails.sendNativeQuery(getCurrentArticleQuery, [articleName])
-    const articleProperties = queryResult.rows[0]
-
-    const oldContent = JSON.parse(articleProperties.content)
-    const oldSources = JSON.parse(articleProperties.sources)
-    const newContent = req.body.newContent
-    const newSources = req.body.newSources
-
-    const appendedContent = JSON.stringify(oldContent.concat(newContent))
-    const appendedSources = JSON.stringify(oldSources.concat(newSources))
-
     const articleExists = queryResult.rows.length > 0 ? true : false
     const updateMethod = req.body.updateMethod
     const updatedPublicStatus = req.body.public
@@ -138,6 +128,7 @@ module.exports = {
       return res.badRequest("updateMethod must be defined. Options are 'append' & 'overwrite'")
     }
     
+    // APPEND ARTICLE PROPERTIES
     if(updateMethod === "append") {
       if (newContent && newSources) {
           await sails.sendNativeQuery(`UPDATE articles SET content = $1, sources = $2, updatedAt = $3 WHERE articlename = $4`, [appendedContent, appendedSources, updatedAt, articleName])
@@ -174,7 +165,9 @@ module.exports = {
         } else {
           res.badRequest('You must provide data for the update request to proceed')
         }
-    }
+      }else{
+        return res.status(400).send({success: false, message: "Either no method was provided or an incorrect method was provided. Please provide a method of either 'append' or 'overwrite' in your JSON request"});
+      }
   },
   // RATINGS - functions relating to the ratings feature for articles
   getRating: async function(req, res) {
