@@ -105,7 +105,7 @@ module.exports = {
       req.body.public
     ]);
 
-    return res.ok({success: true, message: "Article created"});
+    return res.status(201).send({success: true, message: "Article created"});
   },
   updateArticle: async function(req, res) {
     // CURRENT ARTICLE
