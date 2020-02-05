@@ -125,55 +125,51 @@ module.exports = {
     const appendedContent = JSON.stringify(oldContent.concat(newContent))
     const appendedSources = JSON.stringify(oldSources.concat(newSources))
 
-    console.log(typeof newContent)
-    console.log(newContent)
-    console.log(typeof newSources)
-    console.log(newSources)
-    console.log(typeof appendedContent)
-    console.log(appendedContent)
-    console.log(typeof appendedSources)
-    console.log(appendedSources)
-
-    console.log(`UPDATE articles SET content = ${appendedContent}, sources = ${appendedSources} WHERE articlename = ${articleName}`)
-
     const articleExists = queryResult.rows.length > 0 ? true : false
     const updateMethod = req.body.updateMethod
     const updatedPublicStatus = req.body.public
     const updatedAt = Math.round(new Date().getTime())
 
-    // if (!articleExists) {
-    //   return res.badRequest("No article found with that name. Please create the article first, or try again with an existing article name")
-    // }
+    if (!articleExists) {
+      return res.badRequest("No article found with that name. Please create the article first, or try again with an existing article name")
+    }
 
-    // if (updateMethod === undefined) {
-    //   return res.badRequest("updateMethod must be defined. Options are 'append' & 'overwrite'")
-    // }
+    if (updateMethod === undefined) {
+      return res.badRequest("updateMethod must be defined. Options are 'append' & 'overwrite'")
+    }
     
-    // if (updateMethod === "append"){
-    //     await sails.sendNativeQuery(`UPDATE articles SET content = $1 sources = $2 WHERE articlename = $3`, [appendedContent, appendedSources, articleName])
-    //     const updatedArticle = await sails.sendNativeQuery(`SELECT * FROM articles WHERE articlename = $1`, [articleName])
-
-    //   if(updatedArticle){
-    //       return res.ok({success: true, article: updatedArticle.rows[0]})
-    //     } else {
-    //       return res.badRequest('Error updating')
-    //   }
-    // }
+    if(updateMethod === "append") {
+      if (newContent && newSources) {
+          await sails.sendNativeQuery(`UPDATE articles SET content = $1, sources = $2, updatedAt = $3 WHERE articlename = $4`, [appendedContent, appendedSources, updatedAt, articleName])
+      } else if (newContent) {
+          content = newContent
+          await sails.sendNativeQuery(`UPDATE articles SET content = $1, updatedAt = $2 WHERE articlename = $3`, [appendedContent, updatedAt, articleName])
+      } else if (newSources) {
+          sources = newSources
+          await sails.sendNativeQuery(`UPDATE articles SET sources = $1, updatedAt = $2 WHERE articlename = $3`, [appendedSources, updatedAt, articleName])
+      } else {
+        res.badRequest('You must provide data for the update request to proceed')
+      }
+      const updatedArticle = await sails.sendNativeQuery(`SELECT * FROM articles WHERE articlename = $1`, [articleName])
+      if(updatedArticle){
+        return res.ok({success: true, message: "Article updated", article: updatedArticle.rows[0]})
+      }
+  }
 
     // OVERWRITE ARTICLE PROPERTIES
     if(updateMethod === "overwrite") {
         if (newContent && newSources) {
             content = newContent
             sources = newSources
-            await sails.sendNativeQuery(`UPDATE articles SET content = $1, sources = $2 WHERE articlename = $3`, [content, sources, articleName])
+            await sails.sendNativeQuery(`UPDATE articles SET content = $1, sources = $2, updatedAt = $3 WHERE articlename = $4`, [content, sources, updatedAt, articleName])
             res.ok('Article updated')
         } else if (newContent) {
             content = newContent
-            await sails.sendNativeQuery(`UPDATE articles SET content = $1 WHERE articlename = $2`, [content, articleName])
+            await sails.sendNativeQuery(`UPDATE articles SET content = $1, updatedAt = $2 WHERE articlename = $3`, [content, updatedAt, articleName])
             res.ok('Article updated')
         } else if (newSources) {
             sources = newSources
-            await sails.sendNativeQuery(`UPDATE articles SET sources = $1 WHERE articlename = $2`, [sources, articleName])
+            await sails.sendNativeQuery(`UPDATE articles SET sources = $1, updatedAt = $2 WHERE articlename = $3`, [sources, updatedAt, articleName])
             res.ok('Article updated')
         } else {
           res.badRequest('You must provide data for the update request to proceed')

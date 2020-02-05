@@ -17,7 +17,7 @@ module.exports.routes = {
   'GET /api/v1/articles': 'ArticlesController.getArticles',
   'GET /api/v1/article/:articlename': 'ArticlesController.getArticle',
   'POST /api/v1/articles/create': "ArticlesController.generateArticle",
-  'POST /api/v1/:articlename/update': "ArticlesController.updateArticle",
+  'POST /api/v1/articles/update': "ArticlesController.updateArticle",
 
   // Ratings routes
   'GET /api/v1/:articlename/rating': 'ArticlesController.getRating',
