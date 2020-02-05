@@ -73,17 +73,14 @@ module.exports = {
   },
   generateArticle: async function(req, res) {
     const newArticleName = req.body.articlename;
-    const checkArticlesQuery = `SELECT articlename FROM articles WHERE articlename = $1`;
-    const checkArticlesResult = await sails.sendNativeQuery(
-      checkArticlesQuery,
-      [newArticleName]
-    );
-    const articleExists = checkArticlesResult.rows.length > 0 ? true : false;
-    const createdAt = Math.round(new Date().getTime());
-    const updatedAt = Math.round(new Date().getTime());
+    const checkArticlesQuery = `SELECT articlename FROM articles WHERE articlename = $1`
+    const checkArticlesResult = await sails.sendNativeQuery(checkArticlesQuery, [newArticleName])
+    const articleExists = checkArticlesResult.rows.length > 0 ? true : false
+    const createdAt = Math.round(new Date().getTime())
+    const updatedAt = Math.round(new Date().getTime())
 
     if (articleExists) {
-      res.badRequest("Article already exists");
+      res.badRequest("Article already exists")
     }
 
     const insertArticleQuery = `INSERT INTO articles (
@@ -94,7 +91,7 @@ module.exports = {
       updatedAt,
       public,
       rating)
-      VALUES($1, $2, $3, $4, $5, $6, 0)`;
+      VALUES($1, $2, $3, $4, $5, $6, 0)`
 
     await sails.sendNativeQuery(insertArticleQuery, [
       newArticleName,
@@ -103,9 +100,15 @@ module.exports = {
       createdAt,
       updatedAt,
       req.body.public
-    ]);
+    ])
 
-    return res.ok("Article created");
+    const newArticle = await sails.sendNativeQuery(`SELECT * FROM articles WHERE articlename = $1`, [newArticleName])
+
+    return res.status(201).send({
+      success: true,
+      message: "Article created",
+      article: newArticle.rows[0]
+    })
   },
   updateArticle: async function(req, res) {
     // CURRENT ARTICLE
