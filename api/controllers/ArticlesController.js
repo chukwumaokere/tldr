@@ -83,7 +83,7 @@ module.exports = {
     const updatedAt = Math.round(new Date().getTime());
 
     if (articleExists) {
-      res.badRequest("Article already exists");
+      res.status(400).send({success: false, message: "Article already exists"});
     }
 
     const insertArticleQuery = `INSERT INTO articles (
@@ -105,7 +105,7 @@ module.exports = {
       req.body.public
     ]);
 
-    return res.ok("Article created");
+    return res.ok({success: true, message: "Article created"});
   },
   updateArticle: async function(req, res) {
     // CURRENT ARTICLE
