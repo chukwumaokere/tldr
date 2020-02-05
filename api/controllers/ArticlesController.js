@@ -109,72 +109,71 @@ module.exports = {
   },
   updateArticle: async function(req, res) {
     // CURRENT ARTICLE
-    const articleName = req.body.articlename
+    const articleName = req.param('articlename');
     const getCurrentArticleQuery = `SELECT * FROM articles WHERE articlename = $1`
     const queryResult = await sails.sendNativeQuery(getCurrentArticleQuery, [articleName])
-    const articleProperties = queryResult.rows[0]
-
-    const oldContent = JSON.parse(articleProperties.content)
-    const oldSources = JSON.parse(articleProperties.sources)
-    const newContent = req.body.newContent
-    const newSources = req.body.newSources
-
-    const appendedContent = JSON.stringify(oldContent.concat(newContent))
-    const appendedSources = JSON.stringify(oldSources.concat(newSources))
-
-    console.log(typeof newContent)
-    console.log(newContent)
-    console.log(typeof newSources)
-    console.log(newSources)
-    console.log(typeof appendedContent)
-    console.log(appendedContent)
-    console.log(typeof appendedSources)
-    console.log(appendedSources)
-
-    console.log(`UPDATE articles SET content = ${appendedContent}, sources = ${appendedSources} WHERE articlename = ${articleName}`)
-
     const articleExists = queryResult.rows.length > 0 ? true : false
-    const updateMethod = req.body.updateMethod
-    const updatedPublicStatus = req.body.public
+    const method = req.body.updateMethod
     const updatedAt = Math.round(new Date().getTime())
 
-    // if (!articleExists) {
-    //   return res.badRequest("No article found with that name. Please create the article first, or try again with an existing article name")
-    // }
+    var appendedContent = [];
+    var appendedSources = [];
 
-    // if (updateMethod === undefined) {
-    //   return res.badRequest("updateMethod must be defined. Options are 'append' & 'overwrite'")
-    // }
-    
-    // if (updateMethod === "append"){
-    //     await sails.sendNativeQuery(`UPDATE articles SET content = $1 sources = $2 WHERE articlename = $3`, [appendedContent, appendedSources, articleName])
-    //     const updatedArticle = await sails.sendNativeQuery(`SELECT * FROM articles WHERE articlename = $1`, [articleName])
+    if(articleExists){
+      const articleProperties = queryResult.rows[0]
 
-    //   if(updatedArticle){
-    //       return res.ok({success: true, article: updatedArticle.rows[0]})
-    //     } else {
-    //       return res.badRequest('Error updating')
-    //   }
-    // }
+      var oldContent = JSON.parse(articleProperties.content)
+      var oldSources = JSON.parse(articleProperties.sources)
+      var publicStatus = JSON.parse(articleProperties.public)
 
-    // OVERWRITE ARTICLE PROPERTIES
-    if(updateMethod === "overwrite") {
-        if (newContent && newSources) {
-            content = newContent
-            sources = newSources
-            await sails.sendNativeQuery(`UPDATE articles SET content = $1, sources = $2 WHERE articlename = $3`, [content, sources, articleName])
-            res.ok('Article updated')
-        } else if (newContent) {
-            content = newContent
-            await sails.sendNativeQuery(`UPDATE articles SET content = $1 WHERE articlename = $2`, [content, articleName])
-            res.ok('Article updated')
-        } else if (newSources) {
-            sources = newSources
-            await sails.sendNativeQuery(`UPDATE articles SET sources = $1 WHERE articlename = $2`, [sources, articleName])
-            res.ok('Article updated')
-        } else {
-          res.badRequest('You must provide data for the update request to proceed')
+      if(req.body.newContent){
+        var newContent = JSON.parse(req.body.newContent)
+        if(typeof newContent === 'object' && newContent.length > 0){
+          var appendedContent = oldContent.concat(newContent)
         }
+      }else{
+        appendedContent = oldContent
+      }
+      if(req.body.newSources){
+        var newSources = JSON.parse(req.body.newSources)
+        if (typeof newSources === 'object' && newSources.length > 0){
+          var appendedSources = oldSources.concat(newSources)
+        }
+      }else{
+        appendedSources = oldSources
+      }
+      const updatedPublicStatus = req.body.public
+      
+      if(updatedPublicStatus){
+        publicStatus = updatedPublicStatus
+      }
+
+      if (method == "append"){
+
+      }else if (method == "overwrite"){
+        if(newContent){
+          appendedContent = newContent;
+        }
+        if(newSources){
+          appendedSources = newSources;
+        }
+      }else{
+        return res.status(400).send({success: false, message: "Either no method was provided or an incorrect method was provided. Please provide a method of either 'append' or 'overwrite' in your JSON request"});
+      }
+
+      var appendedContent = JSON.stringify(appendedContent);
+      var appendedSources = JSON.stringify(appendedSources);
+      
+      var updateArticle = await sails.sendNativeQuery("UPDATE articles SET content = $1, sources = $2, public = $3, updatedAt = $4 WHERE articlename = $5", [appendedContent, appendedSources, publicStatus, updatedAt, articleName]);
+      //console.log(appendedContent, appendedSources, oldContent, oldSources, newContent, newSources)
+      if (updateArticle) { //TODO: Change this condition to see if query was seuccesful or errored
+        var article = await sails.sendNativeQuery(getCurrentArticleQuery, [articleName])
+        return res.ok({success: true, article: article.rows[0]}); 
+      }else{
+        return res.status(500).send({success: false, message: error500});
+      }
+    }else{
+      return res.status(400).send({success: false, message: "No article found with that name. Please create the article first or try again with a proper article name"});
     }
   },
   // RATINGS - functions relating to the ratings feature for articles
