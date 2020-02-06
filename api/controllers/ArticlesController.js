@@ -7,36 +7,36 @@
 
 module.exports = {
   getHomePage: async function(req, res) {
-    const query = `SELECT articlename, rating FROM articles WHERE public = 1`;
-    const result = await sails.sendNativeQuery(query);
-    let articles = [];
+    const query = `SELECT articlename, rating FROM articles WHERE public = 1`
+    const result = await sails.sendNativeQuery(query)
+    let articles = []
 
     if (result.rows.length > 0) {
       result.rows.forEach(article => {
         articles.push({
           title: article.articlename,
           rating: article.rating
-        });
-      });
+        })
+      })
     } else {
-      return res.notFound();
+      return res.notFound()
     }
 
-    return res.view("pages/homepage", { articles });
+    return res.view("pages/homepage", { articles })
   },
 
   getPage: async function(req, res) {
-    var articlename = req.param("articlename").toLowerCase();
-    var query = `SELECT * FROM articles WHERE articlename = $1 AND public = 1`;
-    var rawResult = await sails.sendNativeQuery(query, [articlename]);
+    var articlename = req.param("articlename").toLowerCase()
+    var query = `SELECT * FROM articles WHERE articlename = $1 AND public = 1`
+    var rawResult = await sails.sendNativeQuery(query, [articlename])
 
     if (rawResult.rows.length > 0) {
-      var target = rawResult.rows[0];
-      var content = JSON.parse(target.content);
-      var articlename_returned = target.articlename;
-      const rating = target.rating;
-      var createdTime = new Date(target.createdAt);
-      var updatedTime = new Date(target.updatedAt);
+      var target = rawResult.rows[0]
+      var content = JSON.parse(target.content)
+      var articlename_returned = target.articlename
+      const rating = target.rating
+      var createdTime = new Date(target.createdAt)
+      var updatedTime = new Date(target.updatedAt)
       // sails.log(articlename_returned, content, createdTime, updatedTime);
       return res.view("pages/article", {
         article: content,
@@ -44,43 +44,43 @@ module.exports = {
         rating,
         ct: createdTime,
         ut: updatedTime
-      });
+      })
     } else {
-      return res.notFound(); //If page doesnt exist, give them a 404. TODO: Later we can add a suggestion page to intake suggestions or fully fleshed articles.
+      return res.notFound() //If page doesnt exist, give them a 404. TODO: Later we can add a suggestion page to intake suggestions or fully fleshed articles.
     }
   },
   getArticles: async function(req, res) {
-    var query = `SELECT * FROM articles`;
-    var rawResult = await sails.sendNativeQuery(query, []);
+    var query = `SELECT * FROM articles`
+    var rawResult = await sails.sendNativeQuery(query, [])
     if (rawResult.rows.length > 0) {
-      var data = rawResult.rows;
-      return res.ok(data);
+      var data = rawResult.rows
+      return res.ok(data)
     } else {
-      return res.ok([]);
+      return res.ok([])
     }
   },
   getArticle: async function(req, res) {
-    var articlename = req.param("articlename").toLowerCase();
-    var query = `SELECT * FROM articles WHERE articlename = $1`;
-    var rawResult = await sails.sendNativeQuery(query, [articlename]);
+    var articlename = req.param("articlename").toLowerCase()
+    var query = `SELECT * FROM articles WHERE articlename = $1`
+    var rawResult = await sails.sendNativeQuery(query, [articlename])
 
     if (rawResult.rows.length > 0) {
-      var data = rawResult.rows[0];
-      return res.ok(data);
+      var data = rawResult.rows[0]
+      return res.ok(data)
     } else {
-      return res.ok([]); //If page doesnt exist, give them a 404. TODO: Later we can add a suggestion page to intake suggestions or fully fleshed articles.
+      return res.ok([]) //If page doesnt exist, give them a 404. TODO: Later we can add a suggestion page to intake suggestions or fully fleshed articles.
     }
   },
   generateArticle: async function(req, res) {
-    const newArticleName = req.body.articlename;
-    const checkArticlesQuery = `SELECT articlename FROM articles WHERE articlename = $1`;
+    const newArticleName = req.body.articlename
+    const checkArticlesQuery = `SELECT articlename FROM articles WHERE articlename = $1`
     const checkArticlesResult = await sails.sendNativeQuery(
       checkArticlesQuery,
       [newArticleName]
-    );
-    const articleExists = checkArticlesResult.rows.length > 0 ? true : false;
-    const createdAt = Math.round(new Date().getTime());
-    const updatedAt = Math.round(new Date().getTime());
+    )
+    const articleExists = checkArticlesResult.rows.length > 0 ? true : false
+    const createdAt = Math.round(new Date().getTime())
+    const updatedAt = Math.round(new Date().getTime())
 
     if (articleExists) {
       res.status(400).send({success: false, message: "Article already exists"});
@@ -94,7 +94,7 @@ module.exports = {
       updatedAt,
       public,
       rating)
-      VALUES($1, $2, $3, $4, $5, $6, 0)`;
+      VALUES($1, $2, $3, $4, $5, $6, 0)`
 
     await sails.sendNativeQuery(insertArticleQuery, [
       newArticleName,
@@ -103,9 +103,18 @@ module.exports = {
       createdAt,
       updatedAt,
       req.body.public
-    ]);
+    ])
 
-    return res.status(201).send({success: true, message: "Article created"});
+    const newArticle = await sails.sendNativeQuery(
+      `SELECT * FROM articles WHERE articlename = $1`,
+      [newArticleName]
+    )
+
+    return res.status(201).send({
+      success: true,
+      message: "Article created",
+      article: newArticle.rows[0]
+    })
   },
   updateArticle: async function(req, res) {
     // CURRENT ARTICLE
@@ -178,33 +187,44 @@ module.exports = {
   },
   // RATINGS - functions relating to the ratings feature for articles
   getRating: async function(req, res) {
-    const articlename = req.param("articlename").toLowerCase();
-    const query = `SELECT articlename, rating FROM articles WHERE articlename = $1`;
-    const result = await sails.sendNativeQuery(query, [articlename]);
-    const data = result.rows[0];
+    const articlename = req.param("articlename").toLowerCase()
+    const query = `SELECT articlename, rating FROM articles WHERE articlename = $1`
+    const result = await sails.sendNativeQuery(query, [articlename])
+    const data = result.rows[0]
 
-    return res.ok(data);
+    return res.ok(data)
   },
   postRating: async function(req, res) {
-    const articlename = req.param("articlename").toLowerCase();
-    const voteDirection = req.param("voteDirection");
+    const articlename = req.param("articlename").toLowerCase()
+    const voteDirection = req.param("voteDirection")
 
-    const ratingQuery = `SELECT rating FROM articles WHERE articlename = $1`;
-    const updateQuery = `UPDATE articles SET rating = $1 WHERE articlename = $2`;
-    const ratingResult = await sails.sendNativeQuery(ratingQuery, [
-      articlename
-    ]);
+    // const ratingQuery = `SELECT rating, downvotes FROM articles WHERE articlename = $1`
+    const ratingQuery = `SELECT rating FROM articles WHERE articlename = $1`
+    const ratingResult = await sails.sendNativeQuery(ratingQuery, [articlename])
+    const updateQuery = `UPDATE articles SET rating = $1, downvotes = $2  WHERE articlename = $3`
 
-    let ratingValue = ratingResult.rows[0].rating;
+    let ratingValue = ratingResult.rows[0].rating
+    // let downvoteValue = ratingResult.rows[0].downvotes
 
     if (voteDirection === "upvote") {
-      ratingValue = ratingValue + 1;
+      ratingValue = ratingValue + 1
     } else if (voteDirection === "downvote") {
-      ratingValue = ratingValue - 1;
+      ratingValue = ratingValue - 1
+      // downvoteValue = downvoteValue + 1
     }
 
-    await sails.sendNativeQuery(updateQuery, [ratingValue, articlename]);
+    if(downvoteValue >= 50) {
+      await sails.sendNativeQuery(`UPDATE articles SET review = 1 WHERE articlename = $1`, [articlename])
+    }
 
-    return res.ok(`Article rating updated`);
+    // await sails.sendNativeQuery(updateQuery, [ratingValue, downvoteValue, articlename])
+    await sails.sendNativeQuery(updateQuery, [ratingValue, articlename])
+
+    return res.ok({
+      success: true,
+      message: "Article rating updated",
+      newRating: ratingValue,
+      //totalDownvotes: downvoteValue
+    })
   }
-};
+}
