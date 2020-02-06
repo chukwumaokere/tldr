@@ -11,7 +11,6 @@
 module.exports.routes = {
  'GET /': 'ArticlesController.getHomePage' ,
  'GET /:articlename': 'ArticlesController.getPage',
- //'GET /article': { action: 'view-article' },
 
   // Article Routes
   'GET /api/v1/articles': 'ArticlesController.getArticles',
