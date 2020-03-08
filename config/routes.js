@@ -11,12 +11,12 @@
 module.exports.routes = {
  'GET /': 'ArticlesController.getHomePage' ,
  'GET /:articlename': 'ArticlesController.getPage',
- //'GET /article': { action: 'view-article' },
 
   // Article Routes
   'GET /api/v1/articles': 'ArticlesController.getArticles',
   'GET /api/v1/article/:articlename': 'ArticlesController.getArticle',
   'POST /api/v1/articles/create': "ArticlesController.generateArticle",
+  'POST /api/v1/:articlename/update': "ArticlesController.updateArticle",
 
   // Ratings routes
   'GET /api/v1/:articlename/rating': 'ArticlesController.getRating',
